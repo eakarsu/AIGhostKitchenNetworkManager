@@ -79,13 +79,17 @@ export default function AIPage({ title, icon, endpoint, fields, subtitle }) {
     setError('');
     setResult(null);
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`/api/ai/${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(formData)
       });
       const data = await res.json();
-      if (data.success) {
+      if (res.ok && data.success) {
         setResult(data.result);
       } else {
         setError(data.error || 'AI analysis failed');

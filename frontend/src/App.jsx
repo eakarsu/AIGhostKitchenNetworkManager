@@ -32,6 +32,32 @@ import AIDemandForecast from './pages/AIDemandForecast';
 import AISentimentAnalysis from './pages/AISentimentAnalysis';
 import AIDynamicPricing from './pages/AIDynamicPricing';
 import AISocialMedia from './pages/AISocialMedia';
+import AISiteSelection from './pages/AISiteSelection';
+import AIBrandPortfolio from './pages/AIBrandPortfolio';
+import AIIngredientSubstitution from './pages/AIIngredientSubstitution';
+import AIDriverRouteOptimization from './pages/AIDriverRouteOptimization';
+import AICannibalizationDetection from './pages/AICannibalizationDetection';
+import CustomFeatures from './pages/CustomFeatures';
+import Compliance from './pages/Compliance';
+import CustomerComms from './pages/CustomerComms';
+
+// === Batch 04 Gaps & Frontend Mounts ===
+import CfAgenticKitchenAutomationPrioritizing from './pages/CfAgenticKitchenAutomationPrioritizing';
+import CfCrossBrandCannibalizationDetectionFl from './pages/CfCrossBrandCannibalizationDetectionFl';
+import CfSeasonalMenuAdvisorTrackingIngredien from './pages/CfSeasonalMenuAdvisorTrackingIngredien';
+import CfDeliveryZoneHeatMapWithSurge from './pages/CfDeliveryZoneHeatMapWithSurge';
+import CfWorkforceBurnoutPredictionBasedOnLa from './pages/CfWorkforceBurnoutPredictionBasedOnLa';
+import CfCameraBasedFoodSafetyMonitorDetecti from './pages/CfCameraBasedFoodSafetyMonitorDetecti';
+import GapNoGhostKitchenSiteSelectionAi from './pages/GapNoGhostKitchenSiteSelectionAi';
+import GapNoBrandPortfolioOptimization from './pages/GapNoBrandPortfolioOptimization';
+import GapNoIngredientSubstitutionAi from './pages/GapNoIngredientSubstitutionAi';
+import GapNoDriverRouteOptimization from './pages/GapNoDriverRouteOptimization';
+import GapNoVideoBasedQualityControl from './pages/GapNoVideoBasedQualityControl';
+import GapNoPaymentProcessingSurface from './pages/GapNoPaymentProcessingSurface';
+import GapNoVendorSupplierDirectoryBeyondInve from './pages/GapNoVendorSupplierDirectoryBeyondInve';
+import GapNoRealTimeWebsocketOrderBoard from './pages/GapNoRealTimeWebsocketOrderBoard';
+import GapNoMultiLocationFranchiseRollup from './pages/GapNoMultiLocationFranchiseRollup';
+import GapNoFileUploadModuleForMenu from './pages/GapNoFileUploadModuleForMenu';
 
 const navSections = [
   { title: 'OPERATIONS', items: [
@@ -80,6 +106,14 @@ const navSections = [
     { path: '/ai/sentiment-analysis', label: 'Sentiment Analysis', icon: '💬' },
     { path: '/ai/dynamic-pricing', label: 'Dynamic Pricing', icon: '💲' },
     { path: '/ai/social-media', label: 'Social Media', icon: '📱' },
+    { path: '/ai/site-selection', label: 'Site Selection', icon: '📍' },
+    { path: '/ai/brand-portfolio-optimize', label: 'Brand Portfolio', icon: '🏷️' },
+    { path: '/ai/ingredient-substitution', label: 'Ingredient Sub', icon: '🔄' },
+    { path: '/ai/driver-route-optimization', label: 'Driver Routing', icon: '🚗' },
+    { path: '/ai/cannibalization-detection', label: 'Cannibalization', icon: '⚔️' },
+  ]},
+  { title: '⚡ AUTOMATIONS', items: [
+    { path: '/custom', label: 'Operations Automations', icon: '⚡' },
   ]},
 ];
 
@@ -166,7 +200,33 @@ export default function App() {
           <Route path="/ai/sentiment-analysis" element={<AISentimentAnalysis />} />
           <Route path="/ai/dynamic-pricing" element={<AIDynamicPricing />} />
           <Route path="/ai/social-media" element={<AISocialMedia />} />
-        </Routes>
+          <Route path="/ai/site-selection" element={<AISiteSelection />} />
+          <Route path="/ai/brand-portfolio-optimize" element={<AIBrandPortfolio />} />
+          <Route path="/ai/ingredient-substitution" element={<AIIngredientSubstitution />} />
+          <Route path="/ai/driver-route-optimization" element={<AIDriverRouteOptimization />} />
+          <Route path="/ai/cannibalization-detection" element={<AICannibalizationDetection />} />
+          <Route path="/custom" element={<CustomFeatures />} />
+          <Route path="/compliance" element={<Compliance />} />
+          <Route path="/customer-comms" element={<CustomerComms />} />
+        
+          {/* // === Batch 04 Gaps & Frontend Mounts === */}
+          <Route path="/cf-agentic-kitchen-automation-prioritizing-" element={<CfAgenticKitchenAutomationPrioritizing />} />
+          <Route path="/cf-cross-brand-cannibalization-detection-fl" element={<CfCrossBrandCannibalizationDetectionFl />} />
+          <Route path="/cf-seasonal-menu-advisor-tracking-ingredien" element={<CfSeasonalMenuAdvisorTrackingIngredien />} />
+          <Route path="/cf-delivery-zone-heat-map-with-surge" element={<CfDeliveryZoneHeatMapWithSurge />} />
+          <Route path="/cf-workforce-burnout-prediction-based-on-la" element={<CfWorkforceBurnoutPredictionBasedOnLa />} />
+          <Route path="/cf-camera-based-food-safety-monitor-detecti" element={<CfCameraBasedFoodSafetyMonitorDetecti />} />
+          <Route path="/gap-no-ghost-kitchen-site-selection-ai" element={<GapNoGhostKitchenSiteSelectionAi />} />
+          <Route path="/gap-no-brand-portfolio-optimization" element={<GapNoBrandPortfolioOptimization />} />
+          <Route path="/gap-no-ingredient-substitution-ai" element={<GapNoIngredientSubstitutionAi />} />
+          <Route path="/gap-no-driver-route-optimization" element={<GapNoDriverRouteOptimization />} />
+          <Route path="/gap-no-video-based-quality-control" element={<GapNoVideoBasedQualityControl />} />
+          <Route path="/gap-no-payment-processing-surface" element={<GapNoPaymentProcessingSurface />} />
+          <Route path="/gap-no-vendor-supplier-directory-beyond-inve" element={<GapNoVendorSupplierDirectoryBeyondInve />} />
+          <Route path="/gap-no-real-time-websocket-order-board" element={<GapNoRealTimeWebsocketOrderBoard />} />
+          <Route path="/gap-no-multi-location-franchise-rollup" element={<GapNoMultiLocationFranchiseRollup />} />
+          <Route path="/gap-no-file-upload-module-for-menu" element={<GapNoFileUploadModuleForMenu />} />
+</Routes>
       </main>
     </div>
   );
