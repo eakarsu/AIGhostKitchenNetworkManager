@@ -40,6 +40,7 @@ import AICannibalizationDetection from './pages/AICannibalizationDetection';
 import CustomFeatures from './pages/CustomFeatures';
 import Compliance from './pages/Compliance';
 import CustomerComms from './pages/CustomerComms';
+import CustomViewsPage from './pages/CustomViewsPage';
 
 // === Batch 04 Gaps & Frontend Mounts ===
 import CfAgenticKitchenAutomationPrioritizing from './pages/CfAgenticKitchenAutomationPrioritizing';
@@ -114,6 +115,9 @@ const navSections = [
   ]},
   { title: '⚡ AUTOMATIONS', items: [
     { path: '/custom', label: 'Operations Automations', icon: '⚡' },
+  ]},
+  { title: '🍳 KITCHEN VIEWS', items: [
+    { path: '/custom-views', label: 'Kitchen Views', icon: '🍳' },
   ]},
 ];
 
@@ -208,6 +212,7 @@ export default function App() {
           <Route path="/custom" element={<CustomFeatures />} />
           <Route path="/compliance" element={<Compliance />} />
           <Route path="/customer-comms" element={<CustomerComms />} />
+          <Route path="/custom-views" element={<CustomViewsPage />} />
         
           {/* // === Batch 04 Gaps & Frontend Mounts === */}
           <Route path="/cf-agentic-kitchen-automation-prioritizing-" element={<CfAgenticKitchenAutomationPrioritizing />} />

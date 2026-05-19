@@ -247,6 +247,13 @@ app.use('/api/gap-no-real-time-websocket-order-board', route_gap_no_real_time_we
 app.use('/api/gap-no-multi-location-franchise-rollup', route_gap_no_multi_location_franchise_rollup);
 app.use('/api/gap-no-file-upload-module-for-menu', route_gap_no_file_upload_module_for_menu);
 
+// === Custom Kitchen Views (4 endpoints) — mounted BEFORE 404/listen ===
+const customViewsRoutes = require('./routes/customViews');
+app.use('/api/custom-views', authMiddleware, customViewsRoutes);
+
+// 404 catch-all — keep AFTER custom-views mount
+app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
+
 app.listen(PORT, () => {
   console.log(`Ghost Kitchen API server running on port ${PORT}`);
 });
