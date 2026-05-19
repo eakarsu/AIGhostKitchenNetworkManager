@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 
+function authHeaders() {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export default function CrudPage({ title, icon, apiPath, columns, formFields, subtitle }) {
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -10,9 +15,15 @@ export default function CrudPage({ title, icon, apiPath, columns, formFields, su
 
   const fetchItems = async () => {
     try {
-      const res = await fetch(apiPath);
+      const res = await fetch(apiPath, { headers: { ...authHeaders() } });
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+        return;
+      }
       const data = await res.json();
-      setItems(Array.isArray(data) ? data : []);
+      setItems(Array.isArray(data) ? data : (data?.data || []));
     } catch (e) { console.error(e); }
     setLoading(false);
   };
@@ -46,7 +57,7 @@ export default function CrudPage({ title, icon, apiPath, columns, formFields, su
       const url = editItem ? `${apiPath}/${editItem.id}` : apiPath;
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify(formData)
       });
       if (res.ok) {
@@ -59,7 +70,7 @@ export default function CrudPage({ title, icon, apiPath, columns, formFields, su
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
     try {
-      await fetch(`${apiPath}/${id}`, { method: 'DELETE' });
+      await fetch(`${apiPath}/${id}`, { method: 'DELETE', headers: { ...authHeaders() } });
       setSelected(null);
       fetchItems();
     } catch (e) { console.error(e); }
