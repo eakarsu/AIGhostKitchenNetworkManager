@@ -250,6 +250,7 @@ app.use('/api/gap-no-file-upload-module-for-menu', route_gap_no_file_upload_modu
 // === Custom Kitchen Views (4 endpoints) — mounted BEFORE 404/listen ===
 const customViewsRoutes = require('./routes/customViews');
 app.use('/api/custom-views', authMiddleware, customViewsRoutes);
+app.use('/api/prep-load-balancer', authMiddleware, require('./routes/prepLoadBalancer'));
 
 // 404 catch-all — keep AFTER custom-views mount
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));

@@ -41,6 +41,7 @@ import CustomFeatures from './pages/CustomFeatures';
 import Compliance from './pages/Compliance';
 import CustomerComms from './pages/CustomerComms';
 import CustomViewsPage from './pages/CustomViewsPage';
+import PrepLoadBalancer from './pages/PrepLoadBalancer';
 
 // === Batch 04 Gaps & Frontend Mounts ===
 import CfAgenticKitchenAutomationPrioritizing from './pages/CfAgenticKitchenAutomationPrioritizing';
@@ -59,6 +60,11 @@ import GapNoVendorSupplierDirectoryBeyondInve from './pages/GapNoVendorSupplierD
 import GapNoRealTimeWebsocketOrderBoard from './pages/GapNoRealTimeWebsocketOrderBoard';
 import GapNoMultiLocationFranchiseRollup from './pages/GapNoMultiLocationFranchiseRollup';
 import GapNoFileUploadModuleForMenu from './pages/GapNoFileUploadModuleForMenu';
+
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
 
 const navSections = [
   { title: 'OPERATIONS', items: [
@@ -115,6 +121,7 @@ const navSections = [
   ]},
   { title: '⚡ AUTOMATIONS', items: [
     { path: '/custom', label: 'Operations Automations', icon: '⚡' },
+    { path: '/prep-load-balancer', label: 'Prep Load Balancer', icon: '⚖️' },
   ]},
   { title: '🍳 KITCHEN VIEWS', items: [
     { path: '/custom-views', label: 'Kitchen Views', icon: '🍳' },
@@ -174,6 +181,10 @@ export default function App() {
 
       <main className="main-content">
         <Routes>
+        <Route path="/insights/timeline" element={<TimelineView />} />
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
           <Route path="/" element={<Dashboard />} />
           <Route path="/brands" element={<Brands />} />
           <Route path="/menus" element={<Menus />} />
@@ -213,6 +224,7 @@ export default function App() {
           <Route path="/compliance" element={<Compliance />} />
           <Route path="/customer-comms" element={<CustomerComms />} />
           <Route path="/custom-views" element={<CustomViewsPage />} />
+          <Route path="/prep-load-balancer" element={<PrepLoadBalancer />} />
         
           {/* // === Batch 04 Gaps & Frontend Mounts === */}
           <Route path="/cf-agentic-kitchen-automation-prioritizing-" element={<CfAgenticKitchenAutomationPrioritizing />} />
