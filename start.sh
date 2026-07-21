@@ -1,141 +1,70 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "============================================"
-echo "   👻 AI Ghost Kitchen Network Manager"
-echo "   Starting Application..."
-echo "============================================"
-
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-# Project root
-PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
 
-# Check for .env
-if [ ! -f .env ]; then
-    echo -e "${RED}ERROR: .env file not found!${NC}"
-    echo "Please create a .env file in the project root."
-    exit 1
-fi
-
-# Load env
-set -a
-source .env
-set +a
-
-BACKEND_PORT=${BACKEND_PORT:-3001}
-FRONTEND_PORT=${FRONTEND_PORT:-3000}
-
-# Kill processes on ports
-echo -e "${YELLOW}Cleaning up ports $BACKEND_PORT and $FRONTEND_PORT...${NC}"
-kill_port() {
-    local port=$1
-    local pids=$(lsof -ti:$port 2>/dev/null)
-    if [ -n "$pids" ]; then
-        echo -e "${YELLOW}Killing process(es) on port $port: $pids${NC}"
-        echo "$pids" | xargs kill -9 2>/dev/null
-        sleep 1
-    fi
-}
-
-kill_port $BACKEND_PORT
-kill_port $FRONTEND_PORT
-
-# Check PostgreSQL
-echo -e "${BLUE}Checking PostgreSQL...${NC}"
-if ! command -v psql &> /dev/null; then
-    echo -e "${RED}PostgreSQL client not found. Please install PostgreSQL.${NC}"
-    exit 1
-fi
-
-# Check if PostgreSQL is running
-if ! pg_isready -q 2>/dev/null; then
-    echo -e "${YELLOW}PostgreSQL is not running. Attempting to start...${NC}"
-    if command -v brew &> /dev/null; then
-        brew services start postgresql@14 2>/dev/null || brew services start postgresql 2>/dev/null
-    fi
-    sleep 2
-    if ! pg_isready -q 2>/dev/null; then
-        echo -e "${RED}Could not start PostgreSQL. Please start it manually.${NC}"
-        exit 1
-    fi
-fi
-echo -e "${GREEN}PostgreSQL is running.${NC}"
-
-# Create database and user if they don't exist
-echo -e "${BLUE}Setting up database...${NC}"
-psql postgres -c "CREATE USER ghostkitchen WITH PASSWORD 'ghostkitchen123';" 2>/dev/null
-psql postgres -c "ALTER USER ghostkitchen CREATEDB;" 2>/dev/null
-psql postgres -c "CREATE DATABASE ghostkitchen_db OWNER ghostkitchen;" 2>/dev/null
-psql postgres -c "GRANT ALL PRIVILEGES ON DATABASE ghostkitchen_db TO ghostkitchen;" 2>/dev/null
-echo -e "${GREEN}Database ready.${NC}"
-
-# Install backend dependencies
-echo -e "${BLUE}Installing backend dependencies...${NC}"
-cd "$PROJECT_DIR/backend"
-npm install
-
-# Run seed
-echo -e "${BLUE}Seeding database with sample data...${NC}"
-node seed.js
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Database seeded successfully!${NC}"
+if [[ -d backend ]]; then
+  API_DIR=backend
+  UI_DIR=frontend
+  MIGRATION=backend/migrations/001_governed_workflows.sql
 else
-    echo -e "${RED}Seed failed. Check database connection.${NC}"
-    exit 1
+  API_DIR=server
+  UI_DIR=client
+  MIGRATION=server/migrations/001_governed_workflows.sql
 fi
 
-# Install frontend dependencies
-echo -e "${BLUE}Installing frontend dependencies...${NC}"
-cd "$PROJECT_DIR/frontend"
-npm install
-
-# Start backend with nodemon for hot reload
-echo -e "${GREEN}Starting backend on port $BACKEND_PORT...${NC}"
-cd "$PROJECT_DIR/backend"
-npx nodemon server.js &
-BACKEND_PID=$!
-
-# Wait for backend
-sleep 3
-
-# Start frontend with Vite (hot reload built-in)
-echo -e "${GREEN}Starting frontend on port $FRONTEND_PORT...${NC}"
-cd "$PROJECT_DIR/frontend"
-npx vite --port $FRONTEND_PORT &
-FRONTEND_PID=$!
-
-sleep 2
-
-echo ""
-echo -e "${GREEN}============================================${NC}"
-echo -e "${GREEN}   👻 Ghost Kitchen is RUNNING!${NC}"
-echo -e "${GREEN}============================================${NC}"
-echo -e "${BLUE}   Frontend:  http://localhost:$FRONTEND_PORT${NC}"
-echo -e "${BLUE}   Backend:   http://localhost:$BACKEND_PORT${NC}"
-echo -e "${BLUE}   Login:     admin@ghostkitchen.com / password123${NC}"
-echo -e "${GREEN}============================================${NC}"
-echo ""
-echo -e "${YELLOW}Press Ctrl+C to stop all services${NC}"
-
-# Trap to clean up on exit
-cleanup() {
-    echo ""
-    echo -e "${YELLOW}Shutting down Ghost Kitchen...${NC}"
-    kill $BACKEND_PID 2>/dev/null
-    kill $FRONTEND_PID 2>/dev/null
-    kill_port $BACKEND_PORT
-    kill_port $FRONTEND_PORT
-    echo -e "${GREEN}Goodbye! 👻${NC}"
-    exit 0
+check() {
+  command -v node >/dev/null || { echo "node is required" >&2; return 1; }
+  command -v npm >/dev/null || { echo "npm is required" >&2; return 1; }
+  [[ -f .env ]] || { echo "Create .env from .env.example; no defaults are generated." >&2; return 1; }
+  grep -Eq '^JWT_SECRET=.{32,}$' .env ||
+    { echo "JWT_SECRET must be set to at least 32 characters." >&2; return 1; }
+  if ! grep -Eq '^DATABASE_URL=.+|^DB_HOST=.+' .env; then
+    echo "DATABASE_URL or explicit DB_* settings are required." >&2
+    return 1
+  fi
+  if grep -Eqi 'password123|your_.*key|change[_-]?me|placeholder' .env; then
+    echo "Refusing placeholder or demo credentials." >&2
+    return 1
+  fi
+  echo "Configuration shape is valid. External connectivity and credentials were not verified."
 }
 
-trap cleanup SIGINT SIGTERM
+migrate() {
+  check
+  [[ "${ALLOW_SCHEMA_MIGRATION:-false}" == "true" ]] ||
+    { echo "Set ALLOW_SCHEMA_MIGRATION=true for this explicit operation." >&2; return 1; }
+  : "${DATABASE_URL:?Export DATABASE_URL for the migration process.}"
+  command -v psql >/dev/null || { echo "psql is required" >&2; return 1; }
+  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$MIGRATION"
+}
 
-# Wait
-wait
+start_services() {
+  check
+  [[ -d "$API_DIR/node_modules" && -d "$UI_DIR/node_modules" ]] ||
+    { echo "Dependencies are absent. Run locked installs explicitly before startup." >&2; return 1; }
+
+  npm --prefix "$API_DIR" start &
+  api_pid=$!
+  if node -e "const p=require('./$UI_DIR/package.json');process.exit(p.scripts&&p.scripts.dev?0:1)"; then
+    npm --prefix "$UI_DIR" run dev &
+  else
+    BROWSER=none npm --prefix "$UI_DIR" start &
+  fi
+  ui_pid=$!
+
+  cleanup() {
+    kill "$api_pid" "$ui_pid" 2>/dev/null || true
+    wait "$api_pid" "$ui_pid" 2>/dev/null || true
+  }
+  trap cleanup EXIT INT TERM
+  wait "$api_pid" "$ui_pid"
+}
+
+case "${1:-check}" in
+  check) check ;;
+  migrate) migrate ;;
+  start) start_services ;;
+  *) echo "Usage: ./start.sh [check|migrate|start]" >&2; exit 64 ;;
+esac

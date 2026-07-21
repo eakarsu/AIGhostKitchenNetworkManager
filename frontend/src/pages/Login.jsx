@@ -28,14 +28,6 @@ export default function Login({ onLogin }) {
     }
   };
 
-  const quickLogin = () => {
-    setEmail('admin@ghostkitchen.com');
-    setPassword('password123');
-    setTimeout(() => {
-      document.getElementById('login-form').requestSubmit();
-    }, 100);
-  };
-
   return (
     <div className="login-page">
       <div className="login-card">
@@ -72,9 +64,6 @@ export default function Login({ onLogin }) {
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
-        <button className="quick-login-btn" onClick={quickLogin}>
-          ⚡ Quick Login (Demo Account)
-        </button>
       </div>
     </div>
   );

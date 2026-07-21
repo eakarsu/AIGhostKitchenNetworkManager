@@ -7,7 +7,6 @@ const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const pool = require('./db');
 const authMiddleware = require('./middleware/auth');
 
-if (!process.env.JWT_SECRET) { console.warn('WARNING: JWT_SECRET not set, using insecure default'); }
 
 const app = express();
 
@@ -122,7 +121,7 @@ async function initTables() {
     console.error('table init error:', err.message);
   }
 }
-initTables();
+if (process.env.AUTO_INIT_SCHEMA === 'true') initTables();
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -251,6 +250,7 @@ app.use('/api/gap-no-file-upload-module-for-menu', route_gap_no_file_upload_modu
 const customViewsRoutes = require('./routes/customViews');
 app.use('/api/custom-views', authMiddleware, customViewsRoutes);
 app.use('/api/prep-load-balancer', authMiddleware, require('./routes/prepLoadBalancer'));
+app.use('/api/governed-kitchen-operations', require('./governance'));
 
 // 404 catch-all — keep AFTER custom-views mount
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
