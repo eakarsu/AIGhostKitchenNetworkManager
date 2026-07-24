@@ -6,6 +6,12 @@ if (process.env.ALLOW_DEMO_SEED !== 'true' || process.env.NODE_ENV === 'producti
 const pool = require('./db');
 const bcrypt = require('bcryptjs');
 
+function requireDemoPassword() {
+  const password = process.env.DEMO_PASSWORD || process.env.SEED_DEMO_PASSWORD || process.env.DEMO_SEED_PASSWORD || '';
+  if (password.length < 12 || password.length > 1024) throw new Error('DEMO_PASSWORD must contain 12-1024 characters');
+  return password;
+}
+
 async function seed() {
   const client = await pool.connect();
   try {
@@ -362,7 +368,7 @@ async function seed() {
     console.log('Seeding data...');
 
     // --- Users ---
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    const hashedPassword = await bcrypt.hash(requireDemoPassword(), 10);
     await client.query(`
       INSERT INTO users (email, password, name, role) VALUES
       ($1, $2, 'Admin User', 'admin')
@@ -876,7 +882,7 @@ async function seed() {
     console.log('\n========================================');
     console.log('Database seeded successfully!');
     console.log('========================================');
-    console.log('Admin login: admin@ghostkitchen.com / password123');
+    console.log('Demo login users provisioned from the local environment.');
     console.log('========================================\n');
   } catch (err) {
     console.error('Seeding error:', err);
